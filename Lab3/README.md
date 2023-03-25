@@ -9,6 +9,7 @@
   ```c
   open("/dev/null", O_WRONLY)
   ```
+  ⚠ O_WRONLY 來自 **<fcntl.c>**
   
 * measure excution time
   ```
@@ -16,3 +17,6 @@
   ```
   
 * fsync
+
+
+💬 編譯指令: gcc -o [name] file1.c file2.c ...
