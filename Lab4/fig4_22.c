@@ -72,6 +72,8 @@ static int dopath(Myfunc *func) /* we return whatever func() returns */
 	char buf[256];
 	if (lstat(fullpath, &statbuf) < 0) /* stat error */
 		return (func(fullpath, &statbuf, FTW_NS));
+	
+	total_size += statptr->st_size;
 	if (S_ISDIR(statbuf.st_mode) == 0) /* not a directory */
 		return (func(fullpath, &statbuf, FTW_F));
 	/*
@@ -111,7 +113,6 @@ static int myfunc(const char *pathname, const struct stat *statptr, int type)
 	switch (type)
 	{
 	case FTW_F:
-		total_size += statptr->st_size;
 		switch (statptr->st_mode & S_IFMT)
 		{
 		case S_IFREG: nreg++; break;
