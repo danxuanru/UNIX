@@ -69,6 +69,7 @@ static int dopath(Myfunc *func) /* we return whatever func() returns */
 	DIR *dp;
 	int ret;
 	char *ptr;
+	char buf[256];
 	if (lstat(fullpath, &statbuf) < 0) /* stat error */
 		return (func(fullpath, &statbuf, FTW_NS));
 	if (S_ISDIR(statbuf.st_mode) == 0) /* not a directory */
@@ -87,6 +88,12 @@ static int dopath(Myfunc *func) /* we return whatever func() returns */
 	}
 	while ((dirp = readdir(dp)) != NULL)
 	{
+		// 判斷寫在這裡 invalid=1 valid=2 (正確的)
+		if (readlink(fullpath, buf, sizeof(buf))!=-1){
+			if (access(buf, F_OK) == -1)
+				invalid++;
+		} else valid++;
+		
 		if (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
 			continue;				   /* ignore dot and dot-dot */
 		strcpy(ptr, dirp->d_name);	   /* append name after slash */
@@ -112,10 +119,11 @@ static int myfunc(const char *pathname, const struct stat *statptr, int type)
 		case S_IFCHR: nchr++; break;
 		case S_IFIFO: nfifo++; break;
 		case S_IFLNK:
-			readlink(fullpath, buf, sizeof(buf));
-			if (access(buf, F_OK) == -1)
-				invalid++;
-			else valid++;
+			// 判斷寫在這裡 invalid=3 valid=0
+			//readlink(pathname, buf, sizeof(buf));
+			//if (access(buf, F_OK) == -1)
+			//	invalid++;
+			//else valid++;
 			nslink++;
 			break;
 		case S_IFSOCK: nsock++; break;
